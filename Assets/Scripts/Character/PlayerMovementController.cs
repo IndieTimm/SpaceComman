@@ -7,8 +7,8 @@ namespace Player.Movement
     {
         public float walkSpeed = 1.0F;
         public float runSpeed = 2.0F;
-        public float jumpPower = 2.0F;
-        public float moveDamping = 1.0F;
+        public float rocketPower = 2.0F;
+        public float moveDamping = 2.0F;
     }
 
     [RequireComponent(typeof(Rigidbody))]
@@ -24,17 +24,12 @@ namespace Player.Movement
             }
         }
 
-        public bool IsGrounded
-        {
-            get => isGrounded;
-        }
-
         public Vector3 groundPointOffset;
+        public Vector3 groundBoxScale = Vector3.one;
         public PlayerMovementConfiguration movementConfiguration;
 
         private Vector3 direction;
 
-        private bool isGrounded;
         private float move = 0.0F;
         private float sprint = 0.0F;
 
@@ -54,25 +49,6 @@ namespace Player.Movement
             moveContext = GameInputManager.Instance.GetContext<MoveContext>();
             jumpContext = GameInputManager.Instance.GetContext<JumpContext>();
             sprintContext = GameInputManager.Instance.GetContext<SprintContext>();
-
-            jumpContext.RegisterButtonPressCallback(JumpHandler, GameSystemType.PlayerHighPriority);
-            sprintContext.RegisterButtonPressCallback(SprintHandler, GameSystemType.PlayerHighPriority);
-        }
-
-        private void SprintHandler()
-        {
-            if (sprintContext.IsHold && sprint < sprintThreshould)
-            {
-                sprint = sprintThreshould;
-            }
-        }
-
-        private void JumpHandler()
-        {
-            if (jumpContext.IsHold && IsGrounded)
-            {
-                m_rigidbody.velocity += Physics.gravity.normalized * movementConfiguration.jumpPower;
-            }
         }
 
         private void FixedUpdate()
@@ -99,16 +75,18 @@ namespace Player.Movement
             var speed = Mathf.Lerp(movementConfiguration.walkSpeed, movementConfiguration.runSpeed, sprint);
 
             moveForce *= speed - m_rigidbody.velocity.magnitude;
-            moveForce.y = m_rigidbody.velocity.y;
+
+            if (jumpContext.IsHold)
+            {
+                moveForce += transform.up * movementConfiguration.rocketPower;
+            }
+            else
+            {
+                moveForce.y = m_rigidbody.velocity.y;
+            }
 
             m_rigidbody.velocity = moveForce;
 
-            isGrounded = Physics.Raycast(transform.localToWorldMatrix.MultiplyPoint(groundPointOffset), Physics.gravity, 0.05F);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.DrawSphere(transform.localToWorldMatrix.MultiplyPoint(groundPointOffset), 0.1F);
         }
     }
 }
