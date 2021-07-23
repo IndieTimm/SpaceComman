@@ -1,0 +1,16 @@
+{
+    "name": "InputSystem",
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:86ed271b84ca19d49b67fc91aad66be3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
